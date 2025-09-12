@@ -53,8 +53,9 @@ class ESM2AttentionLayer(nn.Module):
         
         self.dropout = nn.Dropout(config.attention_probs_dropout_prob)
         
-        # Scale factor for attention scores
+        # Scale factor for attention scores (PyTorch calls it 'scaling')
         self.scale = 1.0 / math.sqrt(self.head_dim)
+        self.scaling = self.scale  # PyTorch compatibility
     
     def __call__(
         self, 
@@ -63,71 +64,62 @@ class ESM2AttentionLayer(nn.Module):
         output_attentions: bool = False
     ) -> Tuple[mx.array, Optional[mx.array]]:
         
-        # PyTorch ESM attention expects (seq, batch, dim) format internally
-        # But we work with (batch, seq, dim), so we need to be careful about the computation
+        # We receive (batch, seq, dim) but need to work in (seq, batch, dim) like PyTorch
+        batch_size, seq_len, embed_dim = hidden_states.shape
+        tgt_len = seq_len  # PyTorch naming
+        bsz = batch_size   # PyTorch naming
         
-        batch_size, seq_len, _ = hidden_states.shape
+        # Convert to seq_first: (batch, seq, dim) -> (seq, batch, dim)
+        query = hidden_states.transpose(1, 0, 2)
         
-        # Project to Q, K, V
-        q = self.q_proj(hidden_states)
-        k = self.k_proj(hidden_states)  
-        v = self.v_proj(hidden_states)
+        # PyTorch ESM self-attention: q = self.q_proj(query), etc.
+        q = self.q_proj(query)
+        k = self.k_proj(query)  
+        v = self.v_proj(query)
         
-        # For PyTorch ESM compatibility, we need to mimic their exact computation
-        # PyTorch ESM does: (seq, batch, dim) -> (seq, batch*heads, head_dim)
-        # Then computes attention as: (seq, batch*heads, head_dim) @ (head_dim, seq, batch*heads)
+        # PyTorch scaling: q *= self.scaling
+        q = q * self.scaling
         
-        # Reshape to match PyTorch ESM's internal format
-        # (batch, seq, dim) -> (seq, batch, dim) -> (seq, batch*heads, head_dim)
-        q = q.transpose(1, 0, 2)  # (seq, batch, dim)
-        k = k.transpose(1, 0, 2)  # (seq, batch, dim)  
-        v = v.transpose(1, 0, 2)  # (seq, batch, dim)
+        # PyTorch view and transpose:
+        # q = q.contiguous().view(tgt_len, bsz * self.num_heads, self.head_dim).transpose(0, 1)
+        q = q.reshape(tgt_len, bsz * self.num_heads, self.head_dim).transpose(1, 0, 2)
+        k = k.reshape(tgt_len, bsz * self.num_heads, self.head_dim).transpose(1, 0, 2)
+        v = v.reshape(tgt_len, bsz * self.num_heads, self.head_dim).transpose(1, 0, 2)
+        # Now: (bsz * num_heads, tgt_len, head_dim)
         
-        # Reshape for multi-head: (seq, batch, dim) -> (seq, batch*heads, head_dim)
-        q = q.reshape(seq_len, batch_size * self.num_heads, self.head_dim)
-        k = k.reshape(seq_len, batch_size * self.num_heads, self.head_dim)
-        v = v.reshape(seq_len, batch_size * self.num_heads, self.head_dim)
+        # PyTorch bmm: attn_weights = torch.bmm(q, k.transpose(1, 2))
+        attn_weights = mx.matmul(q, k.transpose(0, 2, 1))
+        # Result: (bsz * num_heads, tgt_len, tgt_len)
         
-        # Compute attention scores: q @ k^T
-        # q: (seq_len, batch*heads, head_dim)
-        # k^T: (batch*heads, head_dim, seq_len) -> (batch*heads, seq_len, head_dim)^T
-        attn_scores = mx.matmul(q.transpose(1, 0, 2), k.transpose(1, 2, 0)) * self.scale
-        # Result: (batch*heads, seq_len, seq_len)
-        
-        # Apply attention mask if provided
+        # Apply mask if provided (skip for now to debug core computation)
         if attention_mask is not None:
-            # Expand mask for all heads: (batch, seq) -> (batch*heads, seq, seq)
             mask_expanded = mx.repeat(attention_mask, self.num_heads, axis=0)
             mask_expanded = mask_expanded[:, None, :] * mask_expanded[:, :, None]
             mask_value = mx.array(-1e9)
-            attn_scores = mx.where(mask_expanded == 1, attn_scores, mask_value)
+            attn_weights = mx.where(mask_expanded == 1, attn_weights, mask_value)
         
-        # Apply softmax
-        attn_probs = mx.softmax(attn_scores, axis=-1)
-        attn_probs = self.dropout(attn_probs)
+        # PyTorch softmax
+        attn_probs = mx.softmax(attn_weights, axis=-1)
+        # Skip dropout: attn_probs = F.dropout(attn_probs, p=self.dropout, training=self.training)
         
-        # Apply attention to values
-        # attn_probs: (batch*heads, seq_len, seq_len)
-        # v: (seq_len, batch*heads, head_dim) -> (batch*heads, seq_len, head_dim)
-        v_transposed = v.transpose(1, 0, 2)
-        attn_output = mx.matmul(attn_probs, v_transposed)
-        # Result: (batch*heads, seq_len, head_dim)
+        # PyTorch bmm: attn = torch.bmm(attn_probs, v)
+        attn = mx.matmul(attn_probs, v)
+        # Result: (bsz * num_heads, tgt_len, head_dim)
         
-        # Reshape back to (seq, batch, dim)
-        attn_output = attn_output.reshape(batch_size, self.num_heads, seq_len, self.head_dim)
-        attn_output = attn_output.transpose(2, 0, 1, 3).reshape(seq_len, batch_size, self.hidden_size)
+        # PyTorch final reshape: attn.transpose(0, 1).contiguous().view(tgt_len, bsz, embed_dim)
+        attn = attn.transpose(1, 0, 2).reshape(tgt_len, bsz, embed_dim)
+        # Result: (tgt_len, bsz, embed_dim) = (seq, batch, dim)
         
-        # Transpose back to (batch, seq, dim)
-        attn_output = attn_output.transpose(1, 0, 2)
+        # PyTorch output projection: attn = self.out_proj(attn)
+        attn = self.out_proj(attn)
         
-        # Final projection
-        attn_output = self.out_proj(attn_output)
+        # Convert back to batch_first for our model: (seq, batch, dim) -> (batch, seq, dim)
+        attn_output = attn.transpose(1, 0, 2)
         
-        # For output_attentions, average over heads like PyTorch ESM
+        # For output_attentions, average over heads
         output_attn_weights = None
         if output_attentions:
-            # Average attention weights over heads: (batch*heads, seq, seq) -> (batch, seq, seq)
-            attn_probs_reshaped = attn_probs.reshape(batch_size, self.num_heads, seq_len, seq_len)
+            attn_probs_reshaped = attn_probs.reshape(bsz, self.num_heads, tgt_len, tgt_len)
             output_attn_weights = mx.mean(attn_probs_reshaped, axis=1)
         
         return attn_output, output_attn_weights

@@ -1,0 +1,30 @@
+# Core requirements for ESMFold-MLX
+mlx>=0.29.0
+numpy>=1.21.0
+scipy>=1.7.0
+
+# Optional dependencies (install with pip install -e .[extra_name])
+# For PyTorch weight conversion:
+# torch>=1.12.0
+# fair-esm>=2.0.0
+
+# For bioinformatics utilities:
+# biotite>=0.36.0
+# biopython>=1.79
+
+# For development:
+# pytest>=6.0.0
+# pytest-cov>=3.0.0
+# black>=22.0.0
+# flake8>=4.0.0
+# mypy>=0.950
+
+# For benchmarking:
+# psutil>=5.8.0
+# matplotlib>=3.5.0
+# seaborn>=0.11.0
+
+# For Jupyter notebooks:
+# jupyter>=1.0.0
+# ipywidgets>=7.6.0
+# plotly>=5.0.0

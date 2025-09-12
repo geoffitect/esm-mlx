@@ -25,7 +25,7 @@ class ESM2Config:
     
     # ESM2 specific
     embed_scale: float = 1.0
-    attention_head_dim: int = 64  # hidden_size // num_attention_heads
+    attention_head_dim: Optional[int] = None  # Will be calculated as hidden_size // num_attention_heads
     use_rotary_embeddings: bool = False
     
     def __post_init__(self):
