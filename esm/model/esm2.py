@@ -9,6 +9,7 @@ import torch.nn as nn
 
 import esm
 from esm.modules import ContactPredictionHead, ESM1bLayerNorm, RobertaLMHead, TransformerLayer
+from esm.data import Alphabet
 
 
 class ESM2(nn.Module):
@@ -17,7 +18,7 @@ class ESM2(nn.Module):
         num_layers: int = 33,
         embed_dim: int = 1280,
         attention_heads: int = 20,
-        alphabet: Union[esm.data.Alphabet, str] = "ESM-1b",
+        alphabet: Alphabet = "ESM-1b",
         token_dropout: bool = True,
     ):
         super().__init__()
