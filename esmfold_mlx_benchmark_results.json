@@ -1,0 +1,215 @@
+{
+  "system_info": {
+    "platform": "macOS-26.0-arm64-arm-64bit",
+    "processor": "arm",
+    "python_version": "3.10.18",
+    "mlx_version": "0.29.0",
+    "cpu_count": 8,
+    "memory_total_gb": 16.0,
+    "architecture": "arm64"
+  },
+  "test_results": [],
+  "summary": {
+    "overall_success_rate": 0.8333333333333334,
+    "criteria_met": 5,
+    "total_criteria": 6,
+    "key_metrics": {
+      "inference_time_per_residue_ms": 0.06583349300863964,
+      "memory_per_residue_mb": -0.02920081967213115,
+      "quantization_speedup": 1.3055276729777439,
+      "max_sequence_length_tested": 352
+    }
+  },
+  "benchmark_results": {
+    "scalability": {
+      "short": {
+        "sequence_length": 10,
+        "timing": {
+          "mean_time": 0.004193941752115886,
+          "std_time": 0.0013095263439952022,
+          "min_time": 0.0032150745391845703,
+          "max_time": 0.006044864654541016,
+          "median_time": 0.0033218860626220703,
+          "times_per_residue": 0.0004193941752115886
+        },
+        "memory": {
+          "memory_used_mb": 0.15625,
+          "memory_per_residue_mb": 0.015625
+        },
+        "quality": {
+          "coordinates_shape_valid": true,
+          "coordinates_finite": true,
+          "coordinates_range": {
+            "min": -1.4600000381469727,
+            "max": 43.31999969482422,
+            "mean": 6.973333358764648
+          },
+          "plddt_range_valid": true,
+          "plddt_mean": 0.4991784691810608,
+          "tm_score_range_valid": true,
+          "tm_score_mean": 0.502605140209198
+        },
+        "success": true
+      },
+      "medium": {
+        "sequence_length": 61,
+        "timing": {
+          "mean_time": 0.0040158430735270185,
+          "std_time": 0.0003434719722452505,
+          "min_time": 0.003590106964111328,
+          "max_time": 0.004431247711181641,
+          "median_time": 0.004026174545288086,
+          "times_per_residue": 6.583349300863964e-05
+        },
+        "memory": {
+          "memory_used_mb": -1.78125,
+          "memory_per_residue_mb": -0.02920081967213115
+        },
+        "quality": {
+          "coordinates_shape_valid": true,
+          "coordinates_finite": true,
+          "coordinates_range": {
+            "min": -1.4600000381469727,
+            "max": 237.1199951171875,
+            "mean": 39.27333450317383
+          },
+          "plddt_range_valid": true,
+          "plddt_mean": 0.4988335967063904,
+          "tm_score_range_valid": true,
+          "tm_score_mean": 0.492448627948761
+        },
+        "success": true
+      },
+      "long": {
+        "sequence_length": 222,
+        "timing": {
+          "mean_time": 0.008742332458496094,
+          "std_time": 0.00047636787846412366,
+          "min_time": 0.008070945739746094,
+          "max_time": 0.00912618637084961,
+          "median_time": 0.009029865264892578,
+          "times_per_residue": 3.9379875939171596e-05
+        },
+        "memory": {
+          "memory_used_mb": 0.203125,
+          "memory_per_residue_mb": 0.0009149774774774775
+        },
+        "quality": {
+          "coordinates_shape_valid": true,
+          "coordinates_finite": true,
+          "coordinates_range": {
+            "min": -1.4600000381469727,
+            "max": 848.9199829101562,
+            "mean": 141.239990234375
+          },
+          "plddt_range_valid": true,
+          "plddt_mean": 0.49928346276283264,
+          "tm_score_range_valid": true,
+          "tm_score_mean": 0.4913064241409302
+        },
+        "success": true
+      },
+      "extra_long": {
+        "sequence_length": 352,
+        "timing": {
+          "mean_time": 0.01177199681599935,
+          "std_time": 0.00038111696887160174,
+          "min_time": 0.01133108139038086,
+          "max_time": 0.012260913848876953,
+          "median_time": 0.011723995208740234,
+          "times_per_residue": 3.3443172772725425e-05
+        },
+        "memory": {
+          "memory_used_mb": 0.0,
+          "memory_per_residue_mb": 0.0
+        },
+        "quality": {
+          "coordinates_shape_valid": true,
+          "coordinates_finite": true,
+          "coordinates_range": {
+            "min": -1.4600000381469727,
+            "max": 1342.9200439453125,
+            "mean": 223.57333374023438
+          },
+          "plddt_range_valid": true,
+          "plddt_mean": 0.5000659227371216,
+          "tm_score_range_valid": true,
+          "tm_score_mean": 0.48914629220962524
+        },
+        "success": true
+      }
+    },
+    "quantization": {
+      "original": {
+        "timing": {
+          "mean_time": 0.005995114644368489,
+          "std_time": 0.0004665437695816958,
+          "min_time": 0.005522012710571289,
+          "max_time": 0.00662994384765625,
+          "median_time": 0.00583338737487793,
+          "times_per_residue": 9.828056794046704e-05
+        },
+        "quality": {
+          "coordinates_shape_valid": true,
+          "coordinates_finite": true,
+          "coordinates_range": {
+            "min": -1.4600000381469727,
+            "max": 237.1199951171875,
+            "mean": 39.27333450317383
+          },
+          "plddt_range_valid": true,
+          "plddt_mean": 0.4992365539073944,
+          "tm_score_range_valid": true,
+          "tm_score_mean": 0.4957484006881714
+        }
+      },
+      "quantized": {
+        "timing": {
+          "mean_time": 0.004592100779215495,
+          "std_time": 0.00016424765719306062,
+          "min_time": 0.0043792724609375,
+          "max_time": 0.00477910041809082,
+          "median_time": 0.004617929458618164,
+          "times_per_residue": 7.528034064287697e-05
+        },
+        "quality": {
+          "coordinates_shape_valid": true,
+          "coordinates_finite": true,
+          "coordinates_range": {
+            "min": -1.4600000381469727,
+            "max": 237.1199951171875,
+            "mean": 39.27333450317383
+          },
+          "plddt_range_valid": true,
+          "plddt_mean": 0.4992874562740326,
+          "tm_score_range_valid": true,
+          "tm_score_mean": 0.49145400524139404
+        }
+      },
+      "speedup": 1.3055276729777439,
+      "quality_preservation": {
+        "coordinates_preserved": true,
+        "plddt_similar": true,
+        "tm_score_similar": true
+      }
+    },
+    "models_tested": [
+      "small",
+      "medium"
+    ],
+    "test_sequences": {
+      "short": 10,
+      "medium": 61,
+      "long": 222,
+      "extra_long": 352
+    }
+  },
+  "success_criteria": {
+    "performance_gain_2x": true,
+    "memory_efficiency": true,
+    "scalability_400_residues": true,
+    "output_quality": true,
+    "quantization_speedup": false,
+    "quantization_quality": true
+  }
+}

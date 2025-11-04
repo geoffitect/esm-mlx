@@ -1,0 +1,35 @@
+# Include README and documentation files
+include README_MLX.md
+include LICENSE
+include requirements.txt
+
+# Include the PORT_PLAN.md for reference
+include PORT_PLAN.md
+
+# Include test files
+recursive-include tests *.py
+include test_*.py
+
+# Include example scripts
+include benchmark_suite.py
+include test_quantization.py
+include test_structure_prediction.py
+include test_api.py
+include weight_converter.py
+
+# Include package metadata
+include esm_mlx/py.typed
+
+# Exclude development and cache files
+global-exclude __pycache__
+global-exclude *.py[co]
+global-exclude .DS_Store
+global-exclude *.so
+global-exclude .git*
+global-exclude .pytest_cache
+
+# Exclude the original ESM files
+exclude setup.py
+exclude esm/*
+exclude scripts/*
+exclude examples/*

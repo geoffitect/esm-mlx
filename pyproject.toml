@@ -1,12 +1,86 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "esm-mlx"
+version = "1.0.0"
+description = "Lightning-fast protein folding on Apple Silicon with MLX"
+readme = "README_MLX.md"
+license = {text = "MIT"}
+authors = [
+    {name = "ESMFold-MLX Team", email = "esmfold-mlx@example.com"}
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers", 
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+]
+keywords = [
+    "protein folding",
+    "machine learning",
+    "transformers",
+    "apple silicon", 
+    "mlx",
+    "bioinformatics",
+    "structural biology",
+    "quantization",
+    "esm",
+    "esmfold"
+]
+requires-python = ">=3.8"
+dependencies = [
+    "mlx>=0.29.0",
+    "numpy>=1.21.0", 
+    "scipy>=1.7.0",
+]
+
+[project.optional-dependencies]
+pytorch = [
+    "torch>=1.12.0",
+    "fair-esm>=2.0.0",
+]
+bio = [
+    "biotite>=0.36.0",
+    "biopython>=1.79",
+]
+dev = [
+    "pytest>=6.0.0",
+    "pytest-cov>=3.0.0",
+    "black>=22.0.0", 
+    "flake8>=4.0.0",
+    "mypy>=0.950",
+]
+benchmark = [
+    "psutil>=5.8.0",
+    "matplotlib>=3.5.0",
+    "seaborn>=0.11.0",
+]
+
+[project.scripts]
+esm-fold = "esm_mlx.cli:fold_command"
+esm-benchmark = "esm_mlx.cli:benchmark_command"
+esm-convert = "esm_mlx.cli:convert_command"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/esm-mlx"
+"Bug Reports" = "https://github.com/yourusername/esm-mlx/issues"
+Source = "https://github.com/yourusername/esm-mlx"
+
+[tool.setuptools.packages.find]
+exclude = ["tests*", "examples*", "docs*"]
+
 [tool.black]
-line-length = 99
-exclude = '''
-/(
-    \.git
-  | __pycache__
-  | build
-  | dist
-  | experimental
-  | third_party
-)/
-'''
+line-length = 100
+target-version = ['py38']
